@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R6: Siege Level Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    #background-color: #f0f0f0;
+    background-image:url('../backgrounds/bg2.jpg');
+    font-size: 16px;
+  }
+  #calculator {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    opacity: 98%;
+    top: 40%;
+    left: 35%;
+    position: absolute;
+    transform: translate(-50%, -50%); 
+  }
+  .level-input {
+    margin-bottom: 10px;
+    position: relative;
+  }
+  label, input, button {
+    font-size: 16px;
+  }
+  .result {
+    display: none;
+  }
+  #checkboxSection {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="calculator">
+  <h2>R6: Siege Level Calculator</h2>
+  <div id="levelInputs">
+    <div class="level-input">
+      <label for="levelInput1">Enter Level:</label>
+      <input type="number" class="level" min="1" data-index="1">
+      <p class="result" id="result1"></p>
+    </div>
+  </div>
+  <button onclick="addLevelInput()">Add Another Account</button>
+  <button onclick="calculateTotalXP()">Calculate Total XP</button>
+  <div id="checkboxSection">
+    <label>
+      <input type="checkbox" id="showXPCheckbox" onchange="toggleXPVisibility()"> Show XP per Level
+    </label>
+  </div>
+  <p id="totalResult"></p>
+  <p id="correspondingLevel"></p>
+</div>
+
+<script>
+  function addLevelInput() {
+    const levelInputs = document.getElementById('levelInputs');
+    const newLevelInput = document.createElement('div');
+    const index = levelInputs.children.length + 1;
+    newLevelInput.classList.add('level-input');
+    newLevelInput.innerHTML = `
+      <label for="levelInput${index}">Enter Level:</label>
+      <input type="number" class="level" min="1" data-index="${index}">
+      <p class="result" id="result${index}"></p>
+    `;
+    levelInputs.appendChild(newLevelInput);
+    attachInputListener(index);
+  }
+
+  function attachInputListener(index) {
+    const inputField = document.querySelector(`.level[data-index="${index}"]`);
+    inputField.addEventListener('input', function() {
+      calculateXP(index);
+    });
+  }
+
+  function calculateXP(index) {
+    const levelInput = document.querySelector(`.level[data-index="${index}"]`);
+    const level = parseInt(levelInput.value);
+    let xpTotal = 0;
+
+    if (!isNaN(level) && level >= 1) {
+      for (let i = 1; i <= level; i++) {
+        xpTotal += (i === 1) ? 0 : 5000 + (i - 2) * 500;
+      }
+      document.getElementById(`result${index}`).textContent = `Total XP: ${xpTotal}`;
+    } else {
+      document.getElementById(`result${index}`).textContent = 'Please enter a valid level (greater than 0).';
+    }
+  }
+
+  function calculateTotalXP() {
+    const levelInputs = document.querySelectorAll('.level');
+    let totalXP = 0;
+
+    levelInputs.forEach(levelInput => {
+      const level = parseInt(levelInput.value);
+      if (!isNaN(level) && level >= 1) {
+        let xpTotal = 0;
+        for (let i = 1; i <= level; i++) {
+          xpTotal += (i === 1) ? 0 : 5000 + (i - 2) * 500;
+        }
+        totalXP += xpTotal;
+      }
+    });
+
+    document.getElementById('totalResult').textContent = `Total XP for all accounts: ${totalXP}`;
+
+    // Calculate corresponding level for the total XP
+    let correspondingLevel = 1;
+    let accumulatedXP = 0;
+    let remainingXP = totalXP;
+    while (remainingXP >= accumulatedXP) {
+      accumulatedXP += (correspondingLevel === 1) ? 0 : 5000 + (correspondingLevel - 2) * 500;
+      if (remainingXP >= accumulatedXP) {
+        correspondingLevel++;
+      }
+    }
+    document.getElementById('correspondingLevel').textContent = `Corresponding Level: ${correspondingLevel - 1}`;
+  }
+
+  function toggleXPVisibility() {
+    const showXPCheckbox = document.getElementById('showXPCheckbox');
+    const results = document.querySelectorAll('.result');
+    results.forEach(result => {
+      result.style.display = showXPCheckbox.checked ? 'block' : 'none';
+    });
+  }
+
+  attachInputListener(1); // Attach input listener to the initial input box
+
+</script>
+
+</body>
+</html>
