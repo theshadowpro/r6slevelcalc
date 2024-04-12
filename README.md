@@ -9,4 +9,3 @@ Website based calculator that allows input of multiple account levels and calcul
 - Ability to remove added input boxes, currently have to refresh the page to clear.
 - 'Enter' button unfocus input box - listener issue
 - Prettier look and better scaling.
-- (Distant Future if poss) R6 api to search account levels from username.
